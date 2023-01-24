@@ -2,6 +2,7 @@ import { buildSchema } from 'graphql'
 import { graphqlHTTP } from 'express-graphql'
 import express from 'express'
 import cors from 'cors'
+import { withCtx } from 'vue'
 
 
 const schema = buildSchema(`
@@ -16,6 +17,14 @@ const schema = buildSchema(`
 
   type Query {
     app: App!
+  }
+
+  input BookInput {
+    title: String!
+  }
+
+  type Mutation {
+    createBook(bookInput: BookInput!): Book!
   }
 `)
 
@@ -44,6 +53,19 @@ app.use('/graphql', graphqlHTTP(() => {
             res(ctx.app)
           }, 500)
         })
+      },
+      createBook: ({
+        bookInput
+      }: any,
+      ctx: typeof context
+      ) => {
+        // @ts-ignore
+        ctx.app.books.push({
+          id: (ctx.app.books.length + 1).toString(),
+          title: bookInput.title
+        })
+
+        return ctx.app.books[ctx.app.books.length - 1]
       }
     }
   }
