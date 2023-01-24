@@ -1,6 +1,7 @@
 import { buildSchema } from 'graphql'
 import { graphqlHTTP } from 'express-graphql'
 import express from 'express'
+import cors from 'cors'
 
 
 const schema = buildSchema(`
@@ -19,6 +20,7 @@ const schema = buildSchema(`
 `)
 
 const app = express()
+app.use(cors())
 
 const context = {
   app: {
@@ -36,8 +38,12 @@ app.use('/graphql', graphqlHTTP(() => {
     graphiql: true,
     schema,
     rootValue: {
-      app: (_: any, ctx: typeof context) => {
-        return ctx.app
+      app: async (_: any, ctx: typeof context) => {
+        return new Promise(res => {
+          setTimeout(() => {
+            res(ctx.app)
+          }, 500)
+        })
       }
     }
   }
