@@ -1,74 +1,30 @@
-import { buildSchema } from 'graphql'
-import { graphqlHTTP } from 'express-graphql'
-import express from 'express'
-import cors from 'cors'
-import { withCtx } from 'vue'
+import { graphqlHTTP } from "express-graphql";
+import express from "express";
+import cors from "cors";
+import { graphqlSchema } from "./schema";
+import { Context } from "./Context";
+import { Book } from "./Book";
 
+const app = express();
 
-const schema = buildSchema(`
-  type App {
-    books:[Book!]!
-  }
+class ServerContext extends Context {
+  books = [new Book({ title: "My book", author: "Lachlan", year: 1990 })];
+}
 
-  type Book {
-    id: String!
-    title: String!
-  }
+const context = new ServerContext()
 
-  type Query {
-    app: App!
-  }
+app.use(cors());
+app.use(
+  "/graphql",
+  graphqlHTTP(() => {
+    return {
+      schema: graphqlSchema,
+      graphiql: true,
+      context,
+    };
+  })
+);
 
-  input BookInput {
-    title: String!
-  }
-
-  type Mutation {
-    createBook(bookInput: BookInput!): Book!
-  }
-`)
-
-const app = express()
-app.use(cors())
-
-const context = {
-  app: {
-    books: [{
-      id: 1,
-      title: 'title'
-    }]
-  }
-} as const
-
-
-app.use('/graphql', graphqlHTTP(() => {
-  return {
-    context,
-    graphiql: true,
-    schema,
-    rootValue: {
-      app: async (_: any, ctx: typeof context) => {
-        return new Promise(res => {
-          setTimeout(() => {
-            res(ctx.app)
-          }, 500)
-        })
-      },
-      createBook: ({
-        bookInput
-      }: any,
-      ctx: typeof context
-      ) => {
-        // @ts-ignore
-        ctx.app.books.push({
-          id: (ctx.app.books.length + 1).toString(),
-          title: bookInput.title
-        })
-
-        return ctx.app.books[ctx.app.books.length - 1]
-      }
-    }
-  }
-}))
-
-app.listen(4000)
+app.listen(4000, () => {
+  console.log("Started server on 4000");
+});
