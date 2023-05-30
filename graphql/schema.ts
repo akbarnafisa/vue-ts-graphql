@@ -2,10 +2,10 @@ import path from "path";
 import { makeSchema } from "nexus";
 import { Book } from "./Book";
 import { Query } from "./Query";
-// import { Mutation } from "./Mutation";
+import { Mutation } from "./Mutation";
 
 export const graphqlSchema = makeSchema({
-  types: [Book, Query],
+  types: [Book, Query, Mutation],
   shouldGenerateArtifacts: true,
   shouldExitAfterGenerateArtifacts: Boolean(process.env.GRAPHQL_CODEGEN),
   outputs: {

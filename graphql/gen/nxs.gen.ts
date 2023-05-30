@@ -16,6 +16,11 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  BookInput: { // input type
+    author: string; // String!
+    title: string; // String!
+    year: number; // Int!
+  }
 }
 
 export interface NexusGenEnums {
@@ -32,6 +37,7 @@ export interface NexusGenScalars {
 export interface NexusGenObjects {
   App: {};
   Book: Book;
+  Mutation: {};
   Query: Query;
 }
 
@@ -54,6 +60,9 @@ export interface NexusGenFieldTypes {
     title: string; // String!
     year: number; // Int!
   }
+  Mutation: { // field return type
+    addBook: NexusGenRootTypes['Book'] | null; // Book
+  }
   Query: { // field return type
     app: NexusGenRootTypes['App']; // App!
     books: NexusGenRootTypes['Book'][]; // [Book!]!
@@ -69,6 +78,9 @@ export interface NexusGenFieldTypeNames {
     title: 'String'
     year: 'Int'
   }
+  Mutation: { // field return type name
+    addBook: 'Book'
+  }
   Query: { // field return type name
     app: 'App'
     books: 'Book'
@@ -76,6 +88,11 @@ export interface NexusGenFieldTypeNames {
 }
 
 export interface NexusGenArgTypes {
+  Mutation: {
+    addBook: { // args
+      input: NexusGenInputs['BookInput']; // BookInput!
+    }
+  }
 }
 
 export interface NexusGenAbstractTypeMembers {
@@ -86,7 +103,7 @@ export interface NexusGenTypeInterfaces {
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
 
-export type NexusGenInputNames = never;
+export type NexusGenInputNames = keyof NexusGenInputs;
 
 export type NexusGenEnumNames = never;
 

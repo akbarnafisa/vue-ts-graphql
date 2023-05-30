@@ -1,32 +1,42 @@
 <template>
-  <div v-if="showBooks.fetching.value">Loading...</div>
-  <div v-else-if="showBooks.error.value">
-    {{ showBooks.error.value }}
+  <div v-if="fetching">
+    Loading...
   </div>
+
+  <div v-else-if="error">
+    Oh no... {{ error }}
+  </div>
+
   <div v-else>
-    <ul>
-      <li v-for="book of showBooks.data.value.app.books">
-        {{ book.title }}
-      </li>
+    <ul v-if="data">
+      <li v-for="book of data.app.books">{{ book.title }}</li>
     </ul>
   </div>
 </template>
 
-<script setup lang="ts">
-import { gql, useQuery } from '@urql/vue'
-
-const ShowBooks = gql`
-  query ShowBooks {
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { useQuery, gql } from '@urql/vue'
+import { GetBooksDocument } from './generated/graphql';
+gql`
+  query GetBooks {
     app {
       books {
-        id
         title
       }
     }
   }
 `
-
-const showBooks = useQuery({
-  query: ShowBooks,
+export default defineComponent({
+  setup() {
+    const result = useQuery({
+      query: GetBooksDocument
+    });
+    return {
+      fetching: result.fetching,
+      data: result.data,
+      error: result.error,
+    };
+  }
 })
 </script>
